@@ -29,6 +29,8 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
@@ -42,23 +44,6 @@ jobs:
             "androidSdkPath": "$ANDROID_HOME"
           }
           EOF
-
-      - name: Update twa-manifest.json with target URL
-        env:
-          APP_URL: ${{ inputs.app_url || 'https://ais-pre-wafv74ztnlerpzyqg7nlwy-972874695443.asia-southeast1.run.app' }}
-        run: |
-          node -e '
-            const fs = require("fs");
-            const appUrl = process.env.APP_URL.replace(/\/+$/, "");
-            const parsed = new URL(appUrl);
-            const manifest = JSON.parse(fs.readFileSync("twa-manifest.json", "utf8"));
-            manifest.host = parsed.host;
-            manifest.iconUrl = appUrl + "/pwa-512x512.png";
-            manifest.maskableIconUrl = appUrl + "/pwa-maskable-512x512.png";
-            manifest.webManifestUrl = appUrl + "/manifest.webmanifest";
-            manifest.fullScopeUrl = appUrl + "/";
-            fs.writeFileSync("twa-manifest.json", JSON.stringify(manifest, null, 2));
-          '
 
       - name: Generate Android signing keystore
         run: |
@@ -75,9 +60,28 @@ jobs:
 
       - name: Generate Android project and build APK & AAB
         env:
+          APP_URL: ${{ inputs.app_url || 'https://ais-pre-wafv74ztnlerpzyqg7nlwy-972874695443.asia-southeast1.run.app' }}
           BUBBLEWRAP_KEYSTORE_PASSWORD: shoaib-keystore-pass
           BUBBLEWRAP_KEY_PASSWORD: shoaib-keystore-pass
         run: |
+          python3 -m http.server 8787 --directory public &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID 2>/dev/null || true" EXIT
+          sleep 1
+
+          node -e '
+            const fs = require("fs");
+            const appUrl = process.env.APP_URL.replace(/\/+$/, "");
+            const parsed = new URL(appUrl);
+            const manifest = JSON.parse(fs.readFileSync("twa-manifest.json", "utf8"));
+            manifest.host = parsed.host;
+            manifest.iconUrl = "http://127.0.0.1:8787/pwa-512x512.png";
+            manifest.maskableIconUrl = "http://127.0.0.1:8787/pwa-maskable-512x512.png";
+            manifest.webManifestUrl = appUrl + "/manifest.webmanifest";
+            manifest.fullScopeUrl = appUrl + "/";
+            fs.writeFileSync("twa-manifest.json", JSON.stringify(manifest, null, 2));
+          '
+
           bubblewrap update --skipVersionUpgrade
           bubblewrap build --skipPwaValidation
 
