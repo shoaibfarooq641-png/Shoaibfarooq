@@ -1,0 +1,6 @@
+{
+  "name": "Shoaib",
+  "description": "An accurate, search-grounded conversational AI assistant named Shoaib.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

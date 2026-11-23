@@ -1,0 +1,158 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-display: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    --font-sans: "Public Sans", system-ui, -apple-system, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
+/* Markdown content typography */
+.shoaib-prose {
+  font-size: 0.96875rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.shoaib-prose > *:first-child {
+  margin-top: 0;
+}
+
+.shoaib-prose > *:last-child {
+  margin-bottom: 0;
+}
+
+.shoaib-prose p {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+
+.shoaib-prose h1,
+.shoaib-prose h2,
+.shoaib-prose h3,
+.shoaib-prose h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  margin-top: 1.35em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+.shoaib-prose h1 { font-size: 1.375rem; }
+.shoaib-prose h2 { font-size: 1.1875rem; }
+.shoaib-prose h3 { font-size: 1.0625rem; }
+
+.shoaib-prose ul,
+.shoaib-prose ol {
+  margin-top: 0.65em;
+  margin-bottom: 0.65em;
+  padding-left: 1.45em;
+}
+
+.shoaib-prose ul {
+  list-style-type: disc;
+}
+
+.shoaib-prose ol {
+  list-style-type: decimal;
+}
+
+.shoaib-prose li {
+  margin-top: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+.shoaib-prose li > p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.shoaib-prose strong {
+  font-weight: 600;
+}
+
+.shoaib-prose a {
+  color: #0d9488;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.dark .shoaib-prose a {
+  color: #2dd4bf;
+}
+
+.shoaib-prose blockquote {
+  margin: 0.9em 0;
+  padding: 0.65em 1em;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.shoaib-prose hr {
+  margin: 1.25em 0;
+  border: 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.shoaib-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.shoaib-prose th,
+.shoaib-prose td {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.shoaib-prose th {
+  font-weight: 600;
+  background: rgba(148, 163, 184, 0.09);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
