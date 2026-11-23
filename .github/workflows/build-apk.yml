@@ -30,18 +30,25 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0 build-tools;34.0.0'
 
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
       - name: Configure Bubblewrap SDK paths
         run: |
+          SDK_PATH="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          if [ ! -e "$SDK_PATH/tools" ] && [ -d "$SDK_PATH/cmdline-tools" ]; then
+            CMD_DIR=$(find "$SDK_PATH/cmdline-tools" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+            if [ -n "$CMD_DIR" ]; then
+              sudo ln -sfn "$CMD_DIR" "$SDK_PATH/tools"
+            fi
+          fi
           mkdir -p ~/.bubblewrap
           cat <<EOF > ~/.bubblewrap/config.json
           {
             "jdkPath": "$JAVA_HOME",
-            "androidSdkPath": "$ANDROID_HOME"
+            "androidSdkPath": "$SDK_PATH"
           }
           EOF
 
