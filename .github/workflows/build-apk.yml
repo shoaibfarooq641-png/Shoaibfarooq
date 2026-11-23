@@ -64,9 +64,29 @@ jobs:
           BUBBLEWRAP_KEYSTORE_PASSWORD: shoaib-keystore-pass
           BUBBLEWRAP_KEY_PASSWORD: shoaib-keystore-pass
         run: |
+          node -e '
+            require("fs").writeFileSync("public/manifest.webmanifest", JSON.stringify({
+              id: "/",
+              name: "Shoaib - Accurate AI Assistant",
+              short_name: "Shoaib",
+              description: "Fast, search-grounded conversational AI assistant for accurate answers about anything and anyone.",
+              theme_color: "#0d9488",
+              background_color: "#ffffff",
+              display: "standalone",
+              orientation: "portrait-primary",
+              start_url: "/",
+              scope: "/",
+              icons: [
+                { src: "/pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+                { src: "/pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+                { src: "/pwa-maskable-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" }
+              ]
+            }, null, 2));
+          '
+
           python3 -m http.server 8787 --directory public &
           SERVER_PID=$!
-          trap "kill $SERVER_PID 2>/dev/null || true" EXIT
+          trap "kill $SERVER_PID 2>/dev/null || true; rm -f public/manifest.webmanifest" EXIT
           sleep 1
 
           node -e '
@@ -77,12 +97,26 @@ jobs:
             manifest.host = parsed.host;
             manifest.iconUrl = "http://127.0.0.1:8787/pwa-512x512.png";
             manifest.maskableIconUrl = "http://127.0.0.1:8787/pwa-maskable-512x512.png";
-            manifest.webManifestUrl = appUrl + "/manifest.webmanifest";
+            manifest.webManifestUrl = "http://127.0.0.1:8787/manifest.webmanifest";
             manifest.fullScopeUrl = appUrl + "/";
             fs.writeFileSync("twa-manifest.json", JSON.stringify(manifest, null, 2));
           '
 
           bubblewrap update --skipVersionUpgrade
+
+          node -e '
+            const fs = require("fs");
+            const appUrl = process.env.APP_URL.replace(/\/+$/, "");
+            const gradlePath = "app/build.gradle";
+            if (fs.existsSync(gradlePath)) {
+              const gradle = fs.readFileSync(gradlePath, "utf8");
+              fs.writeFileSync(
+                gradlePath,
+                gradle.replace(/http:\/\/127\.0\.0\.1:8787\/manifest\.webmanifest/g, appUrl + "/manifest.webmanifest")
+              );
+            }
+          '
+
           bubblewrap build --skipPwaValidation
 
       - name: Upload APK and Play Store AAB artifacts
